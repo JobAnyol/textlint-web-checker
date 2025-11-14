@@ -1,0 +1,40 @@
+{
+  "plugins": {
+    "@textlint/markdown": true,
+    "@textlint/text": true
+  },
+  "rules": {
+    "preset-ja-technical-writing": {
+      "sentence-length": {
+        "max": 100
+      },
+      "max-comma": {
+        "max": 3
+      },
+      "max-ten": {
+        "max": 3
+      },
+      "max-kanji-continuous-len": {
+        "max": 6
+      },
+      "no-mix-dearu-desumasu": {
+        "preferInBody": "ですます",
+        "preferInList": "である"
+      },
+      "no-exclamation-question-mark": true,
+      "ja-no-weak-phrase": true,
+      "ja-no-redundant-expression": true,
+      "ja-no-successive-word": true,
+      "no-doubled-joshi": true
+    },
+    "@textlint-ja/preset-ai-writing": {
+      "no-ai-list-formatting": true,
+      "no-ai-hype-expressions": true,
+      "no-ai-emphasis-patterns": true,
+      "no-ai-colon-continuation": true,
+      "ai-tech-writing-guideline": {
+        "severity": "info"
+      }
+    }
+  }
+}
