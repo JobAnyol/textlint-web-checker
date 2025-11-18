@@ -52,6 +52,13 @@ coverage/
 # nyc test coverage
 .nyc_output
 
+# Testing
+test-results/
+tests/
+test-sample.md
+playwright-report/
+*.mjs
+
 # Dependency directories
 jspm_packages/
 
@@ -104,3 +111,14 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Test files
+test-*.mjs
+test-*.js
+debug-*.mjs
+debug-*.js
+tests/
+playwright.config.ts
+playwright-report/
+test-results/
+.npmrc
