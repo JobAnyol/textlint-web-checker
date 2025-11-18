@@ -42,17 +42,22 @@ function generateMockLintResult(text: string): LintResult {
       });
     }
 
-    // 2. 文の長さチェック（100文字以上）
-    if (lineText.length > 100) {
-      messages.push({
-        type: 'lint',
-        ruleId: 'sentence-length',
-        message: `文が長すぎます。100文字以内にしてください。現在の文字数: ${lineText.length}`,
-        line: currentLine,
-        column: 1,
-        severity: 2
-      });
-    }
+    // 2. 文の長さチェック（100文字以上）- 句点で文を分割してチェック
+    const sentences = lineText.split(/[。．]/);
+    let currentColumn = 1;
+    sentences.forEach((sentence) => {
+      if (sentence.length > 100) {
+        messages.push({
+          type: 'lint',
+          ruleId: 'sentence-length',
+          message: `文が長すぎます。100文字以内にしてください。現在の文字数: ${sentence.length}`,
+          line: currentLine,
+          column: currentColumn,
+          severity: 2
+        });
+      }
+      currentColumn += sentence.length + 1; // +1 は句点の分
+    });
 
     // 3. 冗長な表現のチェック
     const redundantPhrases = [
@@ -96,28 +101,64 @@ function generateMockLintResult(text: string): LintResult {
       }
     });
 
-    // 5. 二重助詞のチェック
-    const doubleJoshi = lineText.match(/([はがをに])[^はがをに]{0,10}\1/);
-    if (doubleJoshi) {
+    // 5. 二重助詞のチェック - すべてのマッチを検出
+    const doubleJoshiPattern = /([はがをに])[^はがをに]{0,10}\1/g;
+    let doubleJoshiMatch;
+    while ((doubleJoshiMatch = doubleJoshiPattern.exec(lineText)) !== null) {
+      const match = doubleJoshiMatch;
       messages.push({
         type: 'lint',
         ruleId: 'no-doubled-joshi',
-        message: `助詞「${doubleJoshi[1]}」が連続して使用されています`,
+        message: `助詞「${match[1]}」が連続して使用されています`,
         line: currentLine,
-        column: lineText.indexOf(doubleJoshi[0]) + 1,
+        column: (match.index || 0) + 1,
         severity: 1
       });
     }
 
-    // 6. 連続する単語のチェック
-    const consecutiveWords = lineText.match(/(\S+)\1/);
-    if (consecutiveWords) {
+    // 6. 連続する単語のチェック - 日本語単語と英単語を区別して検出
+    // 日本語の単語（ひらがな、カタカナ、漢字の2文字以上）
+    const japaneseWordPattern = /([\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]{2,})\1/g;
+    let japaneseMatch;
+    while ((japaneseMatch = japaneseWordPattern.exec(lineText)) !== null) {
+      const match = japaneseMatch;
       messages.push({
         type: 'lint',
         ruleId: 'ja-no-successive-word',
-        message: `「${consecutiveWords[1]}」が連続しています`,
+        message: `「${match[1]}」が連続しています`,
         line: currentLine,
-        column: lineText.indexOf(consecutiveWords[0]) + 1,
+        column: (match.index || 0) + 1,
+        severity: 2
+      });
+    }
+
+    // 英単語（アルファベット3文字以上）
+    // パターン1: 完全に連続（testtest）
+    const englishWordPattern = /([a-zA-Z]{3,})\1/g;
+    let englishMatch;
+    while ((englishMatch = englishWordPattern.exec(lineText)) !== null) {
+      const match = englishMatch;
+      messages.push({
+        type: 'lint',
+        ruleId: 'ja-no-successive-word',
+        message: `「${match[1]}」が連続しています`,
+        line: currentLine,
+        column: (match.index || 0) + 1,
+        severity: 2
+      });
+    }
+
+    // パターン2: スペース区切り（test test）
+    const englishWordPatternWithSpace = /\b([a-zA-Z]{2,})\s+\1\b/g;
+    let englishMatchWithSpace;
+    while ((englishMatchWithSpace = englishWordPatternWithSpace.exec(lineText)) !== null) {
+      const match = englishMatchWithSpace;
+      messages.push({
+        type: 'lint',
+        ruleId: 'ja-no-successive-word',
+        message: `「${match[1]}」が連続しています（スペース区切り）`,
+        line: currentLine,
+        column: (match.index || 0) + 1,
         severity: 2
       });
     }
