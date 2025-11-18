@@ -26,8 +26,20 @@
 
 #### 🔔 通知（重要）
 - **全てのTODO完了時**または**ユーザーのアクションが必要な際**は、最後に**一度だけ**以下のコマンドを実行して通知する：
+
+  **macOS:**
   ```bash
   afplay /System/Library/Sounds/Sosumi.aiff
+  ```
+
+  **Linux:**
+  ```bash
+  paplay /usr/share/sounds/freedesktop/stereo/complete.oga
+  ```
+
+  **Windows (PowerShell):**
+  ```powershell
+  [System.Media.SystemSounds]::Asterisk.Play()
   ```
 
 #### 🇯🇵 言語設定
