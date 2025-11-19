@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # gh-pagesブランチへの書き込み権限を付与
     steps:
       - uses: actions/checkout@v3
 
